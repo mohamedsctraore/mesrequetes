@@ -1,0 +1,8 @@
+select b.ead_num_acte MANDAT,  b.ead_objet LIBELLE, a.dap_cpt_credit CREDIT, SUBSTR(a.dap_lcp_num, 12) DEBIT, b.EAD_CDE_PC_ASSI POSTE 
+from t_detail_acte_depenses a, t_entete_acte_depenses b 
+where a.DAP_EAD_TYPE = 'M'
+and a.DAP_CPT_CREDIT LIKE '401%'
+and a.DAP_CPT_CREDIT not like '40%.%'
+and a.dap_lcp_exe='2021'
+and a.dap_ead_num_acte=b.ead_num_acte
+order by poste, SUBSTR(a.dap_lcp_num, 12)

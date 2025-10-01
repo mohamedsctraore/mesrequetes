@@ -1,0 +1,27 @@
+************************
+select * from FB_LIGNE_PIECE
+where
+(ide_poste,ide_gest,ide_ordo,ide_piece) in
+(select ide_poste, ide_gest,ide_ordo,ide_piece 
+from fb_piece where 
+ide_gest='2021'
+and dat_cad in ('08/07/2021', '13/07/2021')  
+and ide_poste like '660C');
+**********************
+
+select * from FB_LIGNE_TIERS_PIECE
+where
+(ide_poste,ide_gest,ide_ordo,ide_piece) in
+(select ide_poste,ide_gest,ide_ordo,ide_piece 
+from fb_piece 
+where ide_gest='2021'
+and dat_cad in ('08/07/2021', '13/07/2021')  
+and ide_poste like '660C');
+
+***************************
+select * from FB_PIECE
+where
+--ide_piece in ('210088021500510','210092421500293')
+ide_gest='2021'
+and dat_cad in ('08/07/2021', '13/07/2021') 
+and ide_poste like '660C';

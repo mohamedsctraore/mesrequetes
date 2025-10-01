@@ -1,0 +1,1 @@
+insert into fh_ut_pu (ide_site,ide_util,ide_profil,ide_poste,dat_dval,dat_fval) values ('CITFI','N','N','','','')

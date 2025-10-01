@@ -1,0 +1,8 @@
+java -jar -Duser.language=fr -Duser.region=FR fix-aster-1.0.0.war
+
+sudo systemctl start aster-app
+sudo systemctl status aster-app
+sudo systemctl stop aster-app
+
+sudo journalctl -f -n 1000 -u aster-app
+sudo journalctl -f -u aster-app

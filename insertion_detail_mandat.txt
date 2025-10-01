@@ -1,0 +1,21 @@
+--Faire l'insertion des données dans sigob_mandat_sf de pec 
+Insert into sibinterface.SIGOB_MANDAT_SF@sigta
+   (MAND_NUM ,DET_LIG_CODE ,ACTIVITE_CODE ,
+   UNITE_COUT_CODE ,IMPUTATION ,BAILLEUR ,SOURCE_FIN,MONTANT,SECT_CODE,PROG_CODE,ACT_CODE  )
+ select 
+    MAND_NUM ,DET_LIG_CODE ,ACTIVITE_CODE ,
+   UNITE_COUT_CODE ,IMPUTATION ,BAILLEUR ,SOURCE_FIN,MONTANT,SECT_CODE,PROG_CODE,ACT_CODE
+    from SIB_MANDAT_SF
+ where MAND_NUM='numero mandat' and DET_LIG_CODE in ('');
+ 
+ -- ensuite executer la procedure de t_detail en fonction des mandats concernées
+execute sibinterface.pa_detail_acte_depenses_mdt('numero mandat');
+commit; 
+
+--mettre a jour les données du mandat dans pec
+--le statut "mer" à "pec"
+--ensuite le montant global du mandat
+--ensuite le reste a payer en fonction de la liquidité deja payer
+update sigta.t_entete_acte_depenses set ead_statut='PEC',EAD_MNT_CP_TRE='montant global du mandat',EAD_MNT_REST_A_PAY_TR='le reste a payer en fonction de la liquidité deja payer'
+where ead_num_acte ='numero mandat';
+commit; 

@@ -1,0 +1,17 @@
+SET DEFINE OFF;
+Insert into B_TRAITEMENT
+   (NUMTRT, NOMPROG, LIBPROG, TYPE, EXECUTION, 
+    MEDIA_EDT, NATURE, EXEC_HEURE, DIR_PROG, DIR_EDT, 
+    DIR_DEM, DESTINATAIRE, IMPRIMANTE, ORIENTATION, COPIES, 
+    COD_FORMAT, RECTO_VERSO, SENS_RV, BAC, CODE_FIN, 
+    LIB_ERREUR, DAT_CRE, UTI_CRE, DAT_MAJ, UTI_MAJ, 
+    TERMINAL)
+ Values
+   (3865455, 'U212_200B', 'Génération partielle de balance d''entrée', 'B', 'C', 
+    'N', 'E', NULL, '/aster4310ndir/astersrv/prg/sql', NULL, 
+    'D:\astersrv\Exp\tmp', NULL, NULL, NULL, 1, 
+    NULL, NULL, NULL, NULL, 'T', 
+    '20250103 123007 : #I#exploit : Fin de U212_200B sans erreur.  
+', TO_DATE('03/01/2025 11:20:25', 'DD/MM/YYYY HH24:MI:SS'), 'ACCTDBA', TO_DATE('03/01/2025 12:30:07', 'DD/MM/YYYY HH24:MI:SS'), 'PIAF_ADM', 
+    'UNKNOWN');
+COMMIT;

@@ -1,0 +1,41 @@
+Drop Table Doublon_PGAE;
+
+Create Table Doublon_PGAE as
+Select Ide_Piece, Max(Ide_Ecr) Ide_Ecr From Fc_Ecriture
+Where (ide_poste, ide_gest, flg_cptab, ide_ecr, ide_jal)
+in
+(select ide_poste, ide_gest, flg_cptab, ide_ecr, ide_jal
+from fc_ecriture
+where ide_gest = '2025'
+and ide_poste = '503'
+and ide_piece in
+(
+'25020605030009',
+'25020505030005',
+'25020605030005',
+'25020605030004',
+'25020605030003',
+'25020605030006',
+'25020605030007',
+'25020605030008',
+'25020605030001',
+'25020605030002',
+'2502060503000004',
+'2502050503000128',
+'2502060503000010',
+'2502060503000005',
+'2502060503000009',
+'2502040503000040',
+'2502060503000001',
+'2502060503000008',
+'2502060503000006',
+'2502060503000007',
+'2502060503000011',
+'2502050503000129',
+'2502060503000002',
+'2502060503000003'
+)
+)
+Group By Ide_Piece
+Order By ide_Piece
+;

@@ -1,0 +1,202 @@
+CREATE OR REPLACE PROCEDURE SIGTA.TRANSF_PEC_CAD_NDIR (p_poste_centra IN varchar2,p_poste IN varchar2,p_gestion IN varchar2,p_dat IN DATE, p_ret IN OUT NUMBER)
+ IS
+--exec TRANSF_ALJ_ASTER_tk ('684','2018','04/07/2018');
+/*CURSOR c_jal IS SELECT DISTINCT ALJ_TRANSF_JOURNAL FROM ALJ_TRANSFERT WHERE ALJ_TRANSF_POSTE=p_poste AND ALJ_TRANSF_STATUT='NT' AND ALJ_TRANSF_JOURNEE=p_dat AND ALJ_TRANSF_GESTION=p_gestion AND ALJ_TRANSF_MONTANT<>0 ORDER BY ALJ_TRANSF_JOURNAL;
+CURSOR c_schema(p_jal VARCHAR2) IS SELECT DISTINCT ALJ_TRANSF_SCHEMA FROM ALJ_TRANSFERT WHERE ALJ_TRANSF_POSTE=p_poste AND ALJ_TRANSF_STATUT='NT' AND ALJ_TRANSF_JOURNEE=p_dat AND ALJ_TRANSF_JOURNAL=p_jal AND ALJ_TRANSF_GESTION=p_gestion AND ALJ_TRANSF_MONTANT<>0 ORDER BY ALJ_TRANSF_SCHEMA;  
+CURSOR c_transfert(v_journal VARCHAR2,p_schema VARCHAR2) IS SELECT * FROM ALJ_TRANSFERT WHERE ALJ_TRANSF_POSTE=p_poste AND ALJ_TRANSF_STATUT='NT' AND ALJ_TRANSF_JOURNEE=p_dat AND ALJ_TRANSF_GESTION=p_gestion  AND ALJ_TRANSF_JOURNAL=v_journal AND ALJ_TRANSF_SCHEMA=p_schema AND ALJ_TRANSF_MONTANT<>0 ORDER BY ALJ_TRANSF_COMPTE; 
+*/
+
+CURSOR c_pc_assi_sig IS SELECT distinct ead_cde_pc_assi_sig FROM T_ENTETE_ACTE_DEPENSES WHERE ead_cde_pc_assi=p_poste AND to_char(ead_gst_annee)=p_gestion AND ead_dte_pec =p_dat;
+
+CURSOR C_entete_acte_depenses(poste_assi varchar2) IS SELECT ead_num_acte,ead_gst_annee,ead_cde_pc_assi_sig,ead_dte_pec,ead_type,nvl(EAD_MNT_CP_DON,0) EAD_MNT_CP_DON, nvl(EAD_MNT_CP_EMP,0) EAD_MNT_CP_EMP,nvl(EAD_MNT_CP_TRE,0) EAD_MNT_CP_TRE,EAD_RESP_DEP,EAD_OBJET,EAD_DTE_ORDON 
+                                 FROM T_ENTETE_ACTE_DEPENSES 
+                                 WHERE ead_cde_pc_assi_sig=poste_assi AND to_char(ead_gst_annee)=p_gestion AND ead_dte_pec =p_dat
+                                 AND (ead_num_acte,ead_cde_pc_assi_sig) not in (
+                                 SELECT ide_piece, ide_nd_emet FROM FB_PIECE@sigta.ASTERNDIR WHERE ide_nd_emet = poste_assi and ide_gest=p_gestion and dat_cad = p_dat
+                                 );
+CURSOR C_detail_acte_depenses(v_mandat VARCHAR2) IS SELECT dap_ead_num_acte,DAP_STR_CODE,dap_section,NVL(DAP_MNT_DON,0) DAP_MNT_DON,nvl(DAP_MNT_EMP,0) DAP_MNT_EMP,NVL(DAP_MNT_TRE,0) DAP_MNT_TRE,dap_lcp_num,dap_cpt_debit,dap_cpt_credit,DAP_MRG_CODE
+                                 FROM T_DETAIL_ACTE_DEPENSES
+                                 WHERE dap_ead_num_acte = v_mandat;
+
+------------------------------------
+
+--v_chaine_jc                  RM_TYPE_POSTE.ide_chaine_jc@sigta.ASTERNDIR %TYPE;
+--poste_assi                   RM_POSTE.ide_poste@sigta.ASTERNDIR%TYPE;
+v_section                    T_REMANIEMENT_SIG.REMA_SCO_COD%TYPE;
+v_rema_exe                   T_REMANIEMENT_SIG.REMA_EXE%TYPE;
+v_titre                      T_LIGNE_CPS.LCP_CDE_TITRE%TYPE;
+v_num_lig                    NUMBER := 0;
+v_str_lib                    T_SIGFIP_TIERS.STR_LIB%TYPE;
+v_adr                        T_SIGFIP_TIERS.STR_ADR%TYPE;
+v_cpt_credit                 T_DETAIL_ACTE_DEPENSES.DAP_CPT_CREDIT%TYPE;
+v_mrg_code                   T_DETAIL_ACTE_DEPENSES.DAP_MRG_CODE%TYPE;
+v_str_code                   T_DETAIL_ACTE_DEPENSES.DAP_STR_CODE%TYPE;
+v_tel                        T_SIGFIP_TIERS.STR_TEL%TYPE;
+v_mandat                     T_ENTETE_ACTE_DEPENSES.ead_num_acte%TYPE;
+
+--v_valide                       Number:=1;
+
+
+-------- Variables de travail pour les informations en provenance de ASTER a destination d'ASTER ---------------------------
+
+v_ide_mess                      FM_MESSAGE.ide_mess@sigta.ASTERNDIR %TYPE;
+--v_ide_ecr                       FC_ECRITURE.ide_ecr@sigta.ASTERNDIR %TYPE;
+--v_ide_lig                      FC_LIGNE.ide_lig@sigta.ASTERNDIR %TYPE;
+v_count                        NUMBER;
+v_libl_mess                     FM_MESSAGE.libl@sigta.ASTERNDIR%TYPE;
+
+
+
+
+--v_code_err varchar2(20);
+--v_ms_err varchar2(200);
+v_observ_err varchar2(200);
+
+--v_ss_typ Varchar2(6);
+--v_proc varchar2(100);
+--v_table varchar2(100);
+--v_typ_poste RM_TYPE_POSTE.ide_typ_poste@sigta.ASTERNDIR%TYPE;
+
+-------  EXCEPTIONS ---
+
+GEST_ERREUR_TRANSF    exception;
+
+
+v_retour         NUMBER;
+v_ret            NUMBER;
+
+
+BEGIN
+
+    v_ret := p_ret;
+
+
+    FOR v_cur_assi IN c_pc_assi_sig LOOP
+
+        /* recuperation du numero de message */        
+        --        v_ide_mess :=MES.FBOR_INI@sigta.ASTERNDIR(3,'P' ,'DFXXXXX' ,null ,100,p_gestion ,v_libl_mess);
+                select nvl(max(ide_mess)+1,1) into v_ide_mess from piaf_adm.fm_message@sigta.ASTERNDIR where flg_emis_recu='R' and cod_typ_nd='P' and ide_nd_emet=v_cur_assi.ead_cde_pc_assi_sig;
+                INSERT INTO piaf_adm.FM_MESSAGE@sigta.ASTERNDIR(FLG_EMIS_RECU,COD_TYP_ND,IDE_ND_EMET,IDE_MESS,COD_TYP_ND_ORIG,IDE_ND_ORIG,REF_MESS,FLG_EMIS_RECU1,FLG_EMIS_RECU2,IDE_GEST,FLG_PAPIER,IDE_ENV,IDE_SITE_EMET,IDE_SITE_DEST,IDE_DEPECHE,COD_TYP_ND1,IDE_ND_EMET1,IDE_MESS1,COD_STATUT,COD_TYP_MESS,LIBL,NUM_PRIO,COMMENTAIRE,NBR_PIECE,COD_VERSION,MT_CR,MT_DB,NBR_LIGNE,NBR_DEST,DAT_CRE,UTI_CRE,DAT_MAJ,UTI_MAJ,TERMINAL) 
+                VALUES ('R', 'P', v_cur_assi.ead_cde_pc_assi_sig, v_ide_mess, 'O', 'DFXXXXX', v_ide_mess, NULL, NULL,p_gestion, 'N', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 'Ordonnances', 100, NULL, 1, '1.0', 18300969399, 0,1, 1,  sysdate, 'MES',  sysdate, 'MES', 'pts/10');
+
+
+         -------------- INSERTION DANS LA CAD --------------       
+         FOR v_cur_entete IN C_entete_acte_depenses(v_cur_assi.ead_cde_pc_assi_sig) LOOP
+         
+            v_mandat := v_cur_entete.EAD_NUM_ACTE;
+            
+           -- v_ss_typ := decode(v_cur_entete.ead_type,'M','MANDAT','L','LIQUID',NULL);
+            
+            insert into fb_piece@sigta.ASTERNDIR( IDE_POSTE, IDE_GEST, IDE_ORDO, COD_BUD, IDE_PIECE, COD_TYP_ND, IDE_ND_EMET,IDE_MESS, FLG_EMIS_RECU, COD_STATUT, IDE_OPE, OBJET, DAT_EMIS, DAT_RECEPTION, MT, DAT_CF, DAT_CAD,DAT_CPTA, DAT_REFLEXION, IDE_PIECE_INIT, MOTIF_REJ, COD_TYP_PIECE, DAT_CRE, UTI_CRE, DAT_MAJ,UTI_MAJ, TERMINAL,IDE_SS_TYPE ) 
+            values (p_poste_centra,to_char(v_cur_entete.EAD_GST_ANNEE),v_cur_entete.EAD_RESP_DEP,'BGDEP',v_cur_entete.EAD_NUM_ACTE,'P',v_cur_assi.ead_cde_pc_assi_sig,v_ide_mess,'R','RC', NULL, REPLACE(REPLACE(REPLACE(v_cur_entete.EAD_OBJET,'''',''''''), CHR(13), ''), CHR(10), ''),v_cur_entete.EAD_DTE_ORDON,TO_CHAR(to_date(v_cur_entete.ead_dte_pec),'DD/MM/YYYY'),v_cur_entete.EAD_MNT_CP_DON+v_cur_entete.EAD_MNT_CP_EMP+v_cur_entete.EAD_MNT_CP_TRE,TO_CHAR(to_date(v_cur_entete.ead_dte_pec),'DD/MM/YYYY'),TO_CHAR(to_date(v_cur_entete.ead_dte_pec),'DD/MM/YYYY'),NULL,NULL,NULL,NULL,'OD',sysdate,'MES',sysdate,'PIAF_ADM','BOUAKE_03', decode(v_cur_entete.ead_type,'M','MANDAT','L','LIQUID',NULL));
+         
+            FOR v_cur_detail IN C_detail_acte_depenses(v_cur_entete.ead_num_acte) LOOP
+            
+                v_num_lig := v_num_lig+1;
+            --BEGIN
+            
+                IF v_cur_entete.ead_type ='M' THEN
+                
+                    IF v_cur_entete.EAD_GST_ANNEE=2020 THEN
+                
+                        SELECT substr(SECT_CODE,2,2) INTO v_section FROM SIBINTERFACE.SIB_MANDAT WHERE mandat_code= v_cur_entete.ead_num_acte;
+                        
+                    ELSE
+                    
+                        v_section := v_cur_detail.dap_section;
+                    
+                    END IF;
+                    
+                ELSIF v_cur_entete.ead_type ='L' THEN
+                
+                    IF v_cur_entete.EAD_GST_ANNEE=2020 THEN
+            
+                        SELECT substr(SECT_CODE,2,2) INTO v_section FROM SIBINTERFACE.SIB_LIQUIDATION WHERE liq_num= v_cur_entete.ead_num_acte;
+                        
+                    ELSE
+                     
+                        v_section := v_cur_detail.dap_section;
+                    
+                    END IF;
+                    
+                                    
+                END IF;
+            /*
+                SELECT rema_sco_cod,MAX(rema_exe) INTO v_section,v_rema_exe FROM sigta.t_remaniement_sig 
+                WHERE (rema_dest_cod,rema_dat) IN (SELECT rema_dest_cod,MAX(rema_dat) FROM sigta.t_remaniement_sig GROUP BY rema_dest_cod)
+                and rema_dest_cod= substr(v_cur_detail.dap_lcp_num,1,9)
+                GROUP BY rema_dat,rema_sco_cod,rema_dest_cod;
+                
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    v_observ_err := 'Impossible d''obtenir le ministère pour la destination '||substr(v_cur_detail.dap_lcp_num,1,9);
+                    RAISE GEST_ERREUR_TRANSF;
+            
+            END;    
+            
+            BEGIN
+                SELECT lcp_cde_titre INTO v_titre FROM T_LIGNE_CPS WHERE lcp_num = v_cur_detail.dap_lcp_num AND lcp_exe = v_cur_entete.ead_gst_annee;
+                
+            EXCEPTION     
+                WHEN NO_DATA_FOUND THEN
+                    v_observ_err := 'Impossible d''obtenir le titre du mandat '||v_cur_entete.EAD_NUM_ACTE;
+                    RAISE GEST_ERREUR_TRANSF;
+            END;  */
+                insert into fb_ligne_piece@sigta.ASTERNDIR( IDE_POSTE, IDE_GEST, IDE_ORDO, COD_BUD, IDE_PIECE, NUM_LIG,COD_TYP_PIECE, VAR_BUD, IDE_LIG_EXEC, VAR_CPTA, IDE_CPT, IDE_OPE, IDE_ENG, COD_SENS, IDE_LIG_PREV,MT, MT_BUD, VAR_CPTA_HB, IDE_CPT_HB, COD_SENS_HB, DAT_CRE, UTI_CRE, DAT_MAJ, UTI_MAJ,TERMINAL ) 
+                values (p_poste_centra,to_char(v_cur_entete.EAD_GST_ANNEE),v_cur_entete.EAD_RESP_DEP,'BGDEP',v_cur_entete.EAD_NUM_ACTE,v_num_lig,'OD', 'BGD20',v_titre||v_section||v_cur_detail.dap_lcp_num, 'C2020', v_cur_detail.DAP_CPT_DEBIT,NULL,v_cur_entete.EAD_NUM_ACTE,'D',v_titre||v_section||v_cur_detail.dap_lcp_num,v_cur_detail.DAP_MNT_DON+v_cur_detail.DAP_MNT_EMP+v_cur_detail.DAP_MNT_TRE,v_cur_detail.DAP_MNT_DON+v_cur_detail.DAP_MNT_EMP+v_cur_detail.DAP_MNT_TRE,NULL,NULL,NULL,sysdate,'MES',sysdate,'MES', 'pts/6');
+
+                v_str_code := v_cur_detail.dap_str_code;
+                v_cpt_credit := v_cur_detail.dap_cpt_credit; 
+                v_mrg_code   := v_cur_detail.DAP_MRG_CODE; 
+                
+                BEGIN   
+                    select str_lib, STR_ADR, str_tel INTO v_str_lib,v_adr, v_tel FROM T_SIGFIP_TIERS WHERE str_code = v_str_code;
+         
+                EXCEPTION     
+                    WHEN NO_DATA_FOUND THEN
+                        v_observ_err := 'Le tiers '||v_str_code||' est introuvable';
+                        RAISE GEST_ERREUR_TRANSF;
+                END; 
+                
+                insert into fb_ligne_tiers_piece@sigta.ASTERNDIR( IDE_POSTE, IDE_GEST, IDE_ORDO, COD_BUD, IDE_PIECE, NUM_LIG,COD_TYP_PIECE, VAR_CPTA, IDE_CPT, VAR_TIERS, IDE_TIERS, COD_CAT_SOCIOP, COD_TYP_TIERS, COD_SEC, NOM,PRENOM, COD_RETENUE, FLG_OPPO, COD_MODE_REGLEMT, MT, MTT_RETENUE_OPPO, COD_SENS, ADR1, ADR2, ADR3,ADR4, VILLE, CP, BP, PAYS, CPT_BQ, NOM_BQ, NOM_CONTRIB, TELEPH, DAT_CRE, UTI_CRE, DAT_MAJ, UTI_MAJ,TERMINAL, NUM_BQ, IDE_REF_PIECE ) 
+                values (p_poste_centra,to_char(v_cur_entete.EAD_GST_ANNEE),v_cur_entete.EAD_RESP_DEP,'BGDEP',v_cur_entete.EAD_NUM_ACTE,v_num_lig,'OD', 'C2020',v_cpt_credit, 'T2012', v_str_code,NULL,'P',NULL,substr(nvl(replace(v_str_lib,'''',''''''),'Aucun Bénéficiaire reférencé'),1,45),substr(nvl(replace(v_str_lib,'''',''''''),'Aucun Bénéficiaire reférencé'),1,45),NULL,NULL,v_mrg_code,v_cur_detail.DAP_MNT_DON+v_cur_detail.DAP_MNT_EMP+v_cur_detail.DAP_MNT_TRE,NULL,'C',substr(replace(v_adr,'''',''''''),1,32),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,nvl(substr(v_tel,1,15),'NULL'),sysdate,'MES',sysdate, 'MES', 'pts/6', NULL, NULL);
+
+                
+            END LOOP;
+            
+          
+   
+         --   insert into fb_ligne_tiers_piece@sigta.ASTERNDIR( IDE_POSTE, IDE_GEST, IDE_ORDO, COD_BUD, IDE_PIECE, NUM_LIG,COD_TYP_PIECE, VAR_CPTA, IDE_CPT, VAR_TIERS, IDE_TIERS, COD_CAT_SOCIOP, COD_TYP_TIERS, COD_SEC, NOM,PRENOM, COD_RETENUE, FLG_OPPO, COD_MODE_REGLEMT, MT, MTT_RETENUE_OPPO, COD_SENS, ADR1, ADR2, ADR3,ADR4, VILLE, CP, BP, PAYS, CPT_BQ, NOM_BQ, NOM_CONTRIB, TELEPH, DAT_CRE, UTI_CRE, DAT_MAJ, UTI_MAJ,TERMINAL, NUM_BQ, IDE_REF_PIECE ) 
+         --   values (p_poste_centra,to_char(v_cur_entete.EAD_GST_ANNEE),v_cur_entete.EAD_RESP_DEP,'BGDEP',v_cur_entete.EAD_NUM_ACTE,rownum,'OD', 'C2020',v_cpt_credit, 'T2012', v_str_code,NULL,'P',NULL,substr(nvl(replace(v_str_lib,'''',''''''),'Aucun Bénéficiaire reférencé'),1,45),substr(nvl(replace(v_str_lib,'''',''''''),'Aucun Bénéficiaire reférencé'),1,45),NULL,NULL,v_mrg_code,v_cur_entete.EAD_MNT_CP_DON+v_cur_entete.EAD_MNT_CP_EMP+v_cur_entete.EAD_MNT_CP_TRE,NULL,'C',substr(replace(v_adr,'''',''''''),1,32),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,nvl(v_tel,'NULL'),sysdate,'MES',sysdate, 'MES', 'pts/6', NULL, NULL);
+
+            
+            
+          --  substr('''||nvl(replace(v_STR_LIB,'''',''''''),'Aucun Bénéficiaire reférencé')
+            
+         commit;   
+         
+         END LOOP;
+         
+   END LOOP;                  
+  p_ret := v_ret;
+--END LOOP;
+--COMMIT;
+      EXCEPTION
+        WHEN GEST_ERREUR_TRANSF THEN
+           ROLLBACK;
+           select seq_err_pecaster.nextval into p_ret from dual;
+           insert into t_err_pecaster(num_err, code_pc_err, gestion_err, journee_err,lib_err,piece_err)
+           values (p_ret,  p_poste_centra, p_gestion, p_dat, v_observ_err,v_mandat);
+           COMMIT;
+           
+        WHEN OTHERS THEN
+           ROLLBACK;
+           --v_code_err:=sqlcode;
+           v_observ_err:=sqlerrm; 
+           select seq_err_pecaster.nextval into p_ret from dual;
+           insert into t_err_pecaster(num_err, code_pc_err, gestion_err, journee_err,lib_err,piece_err)
+           values (p_ret,  p_poste_centra, p_gestion, p_dat, v_observ_err,v_mandat);
+           COMMIT;
+--           ROLLBACK;
+END;
+/

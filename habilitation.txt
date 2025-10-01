@@ -1,0 +1,9 @@
+---------- ASTER ---------------
+select unique ide_poste from fh_ut_pu where ide_util=7411;
+
+select unique a.ide_profil, (select libn from fh_profil_util
+where ide_profil=a.ide_profil) LIBELLE, a.ide_poste, a.dat_fval  from fh_ut_pu a, fh_profil_util b
+where a.ide_poste='624'
+and a.ide_util=7411
+and a.ide_profil=b.ide_profil
+order by ide_profil;

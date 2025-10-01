@@ -1,0 +1,28 @@
+select ide_poste,ide_piece, ide_cpt, mt
+from fb_ligne_piece
+where (ide_piece, ide_poste, ide_gest) in
+  (
+   select ide_piece, ide_poste, ide_gest 
+   from fb_piece where
+   ide_gest in ('2022')
+   and ide_poste not like '4%'
+   and ide_cpt = '4081'
+   and dat_cad <= '30/06/2022'
+  )
+
+minus
+
+select a.ide_poste, a.ide_piece, b.ide_cpt, mt
+from fc_ecriture a
+left join fc_ligne b on a.ide_poste = b.ide_poste
+and a.flg_cptab = b.flg_cptab
+and a.ide_gest = b.ide_gest
+and a.ide_ecr = b.ide_ecr
+and a.ide_jal = b.ide_jal 
+where a.ide_gest='2022'
+and a.ide_poste not like '4%'
+and a.ide_jal='JPECDEPBG'
+and a.ide_piece like '3%'
+and b.ide_cpt = '4081'
+and a.dat_jc <= '30/06/2022'
+and a.ide_poste = '602C'

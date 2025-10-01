@@ -1,0 +1,6 @@
+Hello, j'espère que vous allez bien. Urbanea vous convie à une visite de nos résidences Olympia à Ebimpe.
+Veuillez lire la vidéo ci-dessous pour avoir plus de détails.
+
+Hello {{1}}, J'espère que vous allez bien. Urbanea vous convie à une visite de nos résidences Olympia à Ebimpe le {{2}}. Veuillez lire la vidéo ci-dessous pour avoir plus de détails.
+
+Pour confirmer votre présence, veuillez cliquer sur le bouton ci-dessous

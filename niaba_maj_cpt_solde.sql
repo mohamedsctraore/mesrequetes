@@ -1,0 +1,5 @@
+exec NIABA.Maj_Manuel_Table_Solde_Cpt_5('2022','7031')
+exec NIABA.Maj_Manuel_Table_Solde_Cpt_5('2022','640')
+exec NIABA.Maj_Manuel_Table_Solde_Cpt_5('2022','623')
+exec NIABA.Maj_Manuel_Table_Solde_Cpt_5('2022','638')
+exec NIABA.Maj_Manuel_Table_Solde_Cpt_5('2022','822')

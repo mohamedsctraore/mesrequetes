@@ -1,0 +1,73 @@
+----------------CONTROLE EXTRANET-----------
+
+select * from SIBINTERFACE.sib_liquidation
+where liq_num in ('211454321100017')	
+
+
+select * from SIBINTERFACE.sib_liquidation_sf
+where liq_num in ('211454321100017')	
+
+
+select * from SIBINTERFACE.sib_mandat
+where mandat_code in ('314177521100015')
+
+5 939 500
+13 571 312
+
+select * from SIBINTERFACE.sib_mandat_sf
+where mand_num in ('314177521100015')
+
+----------------CONTROLE PEC-----------
+select* from sigta.T_ENTETE_ACTE_DEPENSES
+where ead_num_acte in 
+('314177521100015','211454321100017')	
+
+
+select* from sigta.T_DETAIL_ACTE_DEPENSES
+where dap_ead_num_acte in 
+('314177521100015','211454321100017')
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+----------------------SUPPRESSION DANS PEC------------------------------
+delete from sigta.T_DETAIL_ACTE_DEPENSES
+where dap_ead_num_acte='211454321100017'
+
+delete from sigta.T_ENTETE_ACTE_DEPENSES
+where ead_num_acte='211454321100017'
+
+delete from sigob_mandat
+where mandat_code in 
+('314177521100015')	
+
+----------------------SUPPRESSION DANS extranet------------------------------
+
+delete from sib_mandat
+where mandat_code in 
+('314177521100015')
+
+
+delete from SIBINTERFACE.sib_liquidation_sf
+where liq_num in ('211454321100017')
+
+
+delete  from SIBINTERFACE.sib_liquidation
+where liq_num in ('211454321100017')	
+
+
+delete from SIBINTERFACE.sib_actes
+where num_acte in ('314177521100015',
+'211454321100017')
+
+
+delete from SIBINTERFACE.sib_actes_verif
+where num_acte in ('314177521100015',
+'211454321100017')
+
+
+	

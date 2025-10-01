@@ -1,0 +1,6 @@
+select ide_poste,ide_cpt,cod_sens,sum(mt) from fc_ligne where ide_gest='2010' and ide_cpt like '470%' and dat_ecr <='30/11/2010' and flg_cptab='O'
+group by ide_poste,ide_cpt,cod_sens order by ide_poste,ide_cpt,cod_sens desc
+
+
+select cod_sens,sum(mt) from fc_ligne where ide_gest='2010' and ide_cpt like '470%' and dat_ecr <='30/11/2010' and flg_cptab='O'
+group by cod_sens order by cod_sens desc

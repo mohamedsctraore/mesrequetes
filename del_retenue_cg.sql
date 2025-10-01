@@ -1,0 +1,33 @@
+--select * from fc_ligne
+delete from fc_ligne
+where (ide_poste, ide_gest, flg_cptab, ide_jal, ide_ecr) in
+(select ide_poste, ide_gest, flg_cptab, ide_jal, ide_ecr
+from fc_ecriture where
+ide_gest = '2022'
+and ide_poste = '511'
+and ide_piece in
+('2022005110000408',
+'2022005110000409',
+'2022005110000410',
+'2022005110000411',
+'2022005110000412',
+'2022005110000413',
+'2022005110000414',
+'2022005110000415',
+'2022005110000416',
+'2022005110000417',
+'2022005110000418',
+'2022005110000419',
+'2022005110000420',
+'2022005110000421',
+'2022005110000422',
+'2022005110000423',
+'2022005110000424',
+'2022005110000425',
+'2022005110000426')
+
+)
+and ide_cpt like '4751153%'
+and cod_sens = 'C'
+and flg_cptab = 'N'
+;

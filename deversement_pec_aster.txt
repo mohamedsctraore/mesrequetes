@@ -1,0 +1,49 @@
+************** Deversement echoué PEC/ASTER ***********************
+
+select unique poste,mandat,datepec from
+(select a.ead_cde_pc_assi poste, a.ead_num_acte mandat, a.ead_dte_pec datepec from sigta.t_entete_acte_depenses a, t_pec_journees b 
+where a.ead_exe='2021' and ead_cde_pc_assi='704'
+and a.ead_statut not in ('ANN') and ead_dte_pec
+between '01/01/2021' and '28/07/2021'
+and b.jrl_dte_cloture is not null and b.jrl_date=a.ead_dte_pec 
+minus
+select ide_poste poste,ide_piece mandat,dat_cad datepec from fb_piece@asterndir where ide_gest='2021' 
+and ide_poste not like '4%'
+and dat_cad between '01/01/2021' and '28/07/2021') order by poste, datepec
+
+*************** Deversement echoué PEC/ASTER Version 2 *************************
+
+*************** A executer depuis pecmer **************************************
+
+select unique poste,mandat,datepec from
+(select a.ead_cde_pc_assi poste, a.ead_num_acte mandat, a.ead_dte_pec datepec from sigta.t_entete_acte_depenses a, t_pec_journees b 
+where a.ead_exe='2021' 
+and ead_cde_pc_assi='513'
+and a.ead_statut not in ('ANN') 
+and ead_dte_pec like ('%/07/%')
+and b.jrl_dte_cloture is not null and b.jrl_date=a.ead_dte_pec 
+and a.ead_num_acte not in(
+select ide_piece from fb_piece@asterndir where ide_gest='2021' 
+and ide_poste not like '4%'
+and dat_cad between '01/01/2021' and '28/07/2021') ) order by poste, datepec
+
+*******************  A executer version amelioré ********************************
+select unique poste,mandat,datepec from
+(select a.ead_cde_pc_assi poste, a.ead_num_acte mandat, a.ead_dte_pec datepec from sigta.t_entete_acte_depenses a, t_pec_journees b 
+where a.ead_exe='2021' 
+and ead_cde_pc_assi='628'
+and a.ead_statut not in ('ANN') 
+and ead_dte_pec between '01/01/2021' and '11/08/2021'
+and b.jrl_dte_cloture is not null and b.jrl_date=a.ead_dte_pec 
+and a.ead_num_acte not in(
+select ide_piece from fb_piece@asterndir where ide_gest='2021' 
+and ide_poste not like '4%'
+and ide_poste like '%C'
+and dat_cad between '01/01/2021' and '11/08/2021') ) order by poste, datepec
+
+
+**************** Deversement CAD incomplet CGE ************************
+
+select unique ide_poste,dat_cad from fb_piece@asterndir
+where ide_gest='2021'
+and cod_statut='RC'
