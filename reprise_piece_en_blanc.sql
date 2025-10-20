@@ -33,7 +33,7 @@ and (a.ide_ref_piece, a.cod_ref_piece) in
     and ide_cpt in (select unique ide_cpt from fc_ligne where ide_gest = '2025' and ide_jal = 'TREP' and ide_poste = '464' and ide_cpt in (select ide_cpt from fn_compte where flg_justif = 'O') and ide_ref_piece is null)
     and ide_poste = '464'
 )
-and ide_cpt like '474321201%'
+--and ide_cpt like '474641201%'
 group by a.ide_cpt, a.ide_ref_piece, a.cod_ref_piece, b.ide_tiers
 having sum(decode(cod_sens, 'C', mt, -mt)) <> 0
 order by a.ide_cpt, ide_ref_piece
@@ -55,7 +55,7 @@ and ide_jal = 'TREP'
 --and dat_jc = '31/01/2025'
 )
 and ide_cpt in (select ide_cpt from fn_compte where flg_justif = 'O')
-and ide_cpt like '474321201%'
+--and ide_cpt like '474641201%'
 and ide_ref_piece is null
 order by ide_cpt, ide_ecr;
 
@@ -78,7 +78,7 @@ declare
     --and dat_jc = '31/01/2025'
     )
     and ide_cpt in (select ide_cpt from fn_compte where flg_justif = 'O')
-    and ide_cpt like '474321201%'
+    --and ide_cpt like '474641201%'
     and ide_ref_piece is null
     order by ide_cpt, ide_ecr;
     

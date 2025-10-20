@@ -27,8 +27,8 @@ and cod_statut not in ('AN','TR')
 
 -------------------------------------------  CUT --------------------------------------------------------------
 
-select * from fc_ecriture
---delete from fc_ecriture
+--select * from fc_ecriture
+delete from fc_ecriture
 where ide_gest = '2025'
 and (ide_nd_emet, ide_mess) in 
     (
@@ -42,7 +42,7 @@ not in
     where ide_gest = '2025'
 )
 and flg_cptab = 'N'
---and ide_poste = '630'
+--and ide_poste = '511'
 --and ide_mess in (876539,876538,876537,876535,876533)
 ;
 

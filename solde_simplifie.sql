@@ -15,8 +15,9 @@ inner join rm_noeud b on ide_poste = ide_nd
 inner join fn_compte c on a.ide_cpt = c.ide_cpt
 where ide_gest = '2025'
 and flg_cptab = 'O'
---and ide_poste in ('617')
-and substr(a.ide_cpt,1,5) in ('47411','47412','47421','47422')
+and ide_poste in ('451')
+--and a.ide_cpt in ('47412','47422','40831')
+and substr(a.ide_cpt,1,3) in ('470','472','473','475','477','478')
 --and dat_ecr = '14/04/2025'
 --and a.ide_cpt in
 --(
@@ -28,7 +29,8 @@ and substr(a.ide_cpt,1,5) in ('47411','47412','47421','47422')
 --and ide_poste in (SELECT ide_poste FROM rm_poste WHERE ide_poste_centra='510C' or ide_poste='510C')
 --and ide_poste in (SELECT ide_poste FROM rm_poste WHERE ide_typ_poste in ('TC'))
 --and ide_poste in (SELECT ide_poste FROM rm_poste WHERE ide_poste_centra='510C' union select ide_poste from rm_poste where ide_poste_centra in (select ide_poste from rm_poste where ide_typ_poste = 'TC'))
-and dat_ecr between '01/01/2025' and '30/09/2025'
+and ide_poste in (select ide_poste from rm_poste where ide_typ_poste = 'P')
+and dat_ecr between '01/01/2025' and '31/10/2025'
 group by ide_poste, b.libn, a.ide_cpt, c.libn
 having sum(decode(cod_sens, 'D', mt, -mt)) <> 0
 order by a.ide_cpt, a.ide_poste
@@ -80,9 +82,9 @@ Inner Join fn_compte c on a.ide_cpt = c.ide_cpt
 Where a.ide_gest = '2025'
 And a.flg_cptab = 'O'
 --and ide_cpt in ('47411','47421')
-And Substr(a.ide_cpt, 1, 5) = '39031'
+And Substr(a.ide_cpt, 1, 3) = '390'
 --and a.ide_poste in (select ide_poste from rm_poste where ide_typ_poste in ('ACCD','AACCD','AACDC'))
-And dat_ecr <= '30/09/2025'
+And dat_ecr <= '31/10/2025'
 Group By a.ide_poste, ide_poste_centra, b.libn, a.ide_cpt, c.libn
 Having Sum(decode(cod_sens, 'D', mt, -mt)) <> 0
 --order by a.ide_cpt, a.ide_poste
@@ -184,13 +186,13 @@ inner join rm_noeud b on ide_poste = ide_nd
 inner join fn_compte c on a.ide_cpt = c.ide_cpt
 where ide_gest = '2025'
 and flg_cptab = 'O'
-and a.ide_poste = '425'
+and a.ide_poste = '433'
 --AND a.ide_poste in (select ide_poste from rm_poste where ide_poste_centra='421' or ide_poste='421')
---and a.ide_cpt in ('390315')
+and a.ide_cpt in ('4482301')
 --and ide_jal = 'TREP'
 --and ide_poste in (select ide_poste from rm_poste where ide_typ_poste in ('ACCD','AACCD','AACDC'))
 --and ide_poste in (select ide_poste from rm_poste where ide_typ_poste = 'TCDGI' union select ide_poste from rm_poste where ide_poste_centra in (select ide_poste from rm_poste where ide_typ_poste = 'TCDGI'))
-and dat_ecr between '01/01/2025' and '31/08/2025'
+--and dat_ecr between '01/01/2025' and '30/09/2025'
 --and cod_sens = 'D'
 --and substr(ide_cpt, 1,2) = '47' and substr(ide_cpt, 1,3) <> '474'
 group by a.ide_cpt, c.libn, cod_sens_solde, cod_typ_be
@@ -215,11 +217,11 @@ select a.ide_cpt compte, c.libn libelle_compte, cod_sens_solde, cod_typ_be, ide_
 from fc_ligne a
 inner join rm_noeud b on ide_poste = ide_nd
 inner join fn_compte c on a.ide_cpt = c.ide_cpt
-where ide_gest = '2024'
+where ide_gest = '2025'
 and flg_cptab = 'O'
-and ide_poste = '460'
+and ide_poste = '428'
 --and ide_jal = 'TREP'
---and ide_cpt in ('515213')
+--and a.ide_cpt in ('47517204')
 --and ide_poste in (select ide_poste from rm_poste where ide_typ_poste in ('ACCD','AACCD','AACDC'))
 --and dat_ecr <= '24/01/2025'
 --and substr(ide_cpt, 1,2) = '47' and substr(ide_cpt, 1,3) <> '474'
@@ -310,7 +312,7 @@ inner join rm_noeud b on ide_poste = ide_nd
 inner join fn_compte c on a.ide_cpt = c.ide_cpt
 where ide_gest = '2025'
 and flg_cptab = 'O'
-and dat_ecr <= '30/04/2025'
+and dat_ecr <= '30/09/2025'
 and substr(a.ide_cpt, 1, 3) <> '390'
 and substr(a.ide_cpt, 1, 3) <> '363'
 and a.ide_cpt not in ('581122','581312','47052071','5811224')
@@ -348,6 +350,7 @@ select a.ide_poste_centra cf, b.libn, a.compte, a.libelle_compte, case
                                                         else 0 
                                                 end credit  from solde_simplifie a, rm_noeud b
 where a.ide_poste_centra = b.ide_nd
+and a.ide_poste_centra = '630C'
 group by ide_poste_centra, b.libn, compte, libelle_compte
 having sum(mt) <> 0
 order by compte, ide_poste_centra

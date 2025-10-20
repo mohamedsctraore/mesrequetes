@@ -18,8 +18,9 @@ From les_pieces_non_soldees a, fc_ref_piece b
 where a.ide_poste = b.ide_poste
 and a.ide_ref_piece = b.ide_ref_piece
 and a.ide_ref_piece is not null
-and (a.solde <> 0 and b.flg_solde = 'N')
-and a.ide_poste = '451'
-and a.ide_cpt not like '474%'
+--and (a.solde <> 0 and b.flg_solde = 'N')
+--and a.ide_poste In (Select Ide_Poste From Rm_Poste Where Ide_Typ_Poste = 'P')
+and a.ide_poste = '619'
+and a.ide_cpt like '47552%'
 Order By 1,2,4
 ;

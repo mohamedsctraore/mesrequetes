@@ -151,9 +151,9 @@ order by ide_poste_centra, poste_emet, date_envoye;
 select poste_emet, ide_poste_centra post_dest, nvl(compte_envoye, compte_recu) compte, date_envoye journee, mt_envoye, mt_recu, cod_ferm, sysdate date_insertion
 from a_traite_avec_journee 
 where (ide_poste_centra, poste_emet, nvl(compte_envoye,compte_recu)) in (select unique IDE_POSTE_CENTRA, POSTE_EMET, nvl(compte_envoye, compte_recu) from masse_a_traite)
---and ide_poste_centra = '623C'
+--and ide_poste_centra = '630C'
 --and compte_envoye in ('3903027295','39051')
-and cod_ferm = 'C'
+--and cod_ferm = 'C'
 order by ide_poste_centra, poste_emet, nvl(compte_envoye, compte_recu), date_envoye;
 
 select poste_emet, libn, ide_poste_centra post_dest, nvl(compte_envoye, compte_recu) compte, date_envoye journee, mt_envoye, mt_recu, cod_ferm, sysdate date_insertion

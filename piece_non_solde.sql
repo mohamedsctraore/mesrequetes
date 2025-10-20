@@ -27,14 +27,15 @@ select a.ide_poste, a.ide_cpt, b.libn, ide_ref_piece, cod_ref_piece, ide_devise,
 from fc_ligne a, fn_compte b
 where a.ide_cpt = b.ide_cpt 
 and ide_gest = '2025'
-and ide_poste like '501'
+and ide_poste like '430'
 and flg_cptab = 'O'
 and a.ide_cpt in (select ide_cpt from fn_compte where flg_justif = 'O')
 --and a.ide_cpt Like '474%'
---and a.ide_cpt In 
---(
---'474321101'
---)
+and a.ide_cpt In 
+(
+'470123109',
+'470123199'
+)
 --and cod_ref_piece Like '%A%'
 --and dat_ecr <= '31/03/2025'
 group by a.ide_poste, a.ide_cpt, b.libn, ide_ref_piece, cod_ref_piece, ide_devise

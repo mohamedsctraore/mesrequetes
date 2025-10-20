@@ -10,7 +10,7 @@ Begin
 
 Delete From tac_accd;
 
-v_date := '30/04/2025';
+v_date := '30/09/2025';
 
 Open c_paierie;
 

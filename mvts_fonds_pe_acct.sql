@@ -9,7 +9,7 @@ and flg_cptab = 'O'
 and ide_gest = '2025'
 --and spec3 is not null
 --and ide_jal <> 'JTRANSFERT'
-and dat_ecr between '01/01/2025' and '31/08/2025'
+and dat_ecr between '01/01/2025' and '30/09/2025'
 and cod_sens = 'D'
 --and ide_poste in (select ide_poste from piaf_adm.rm_poste where ide_poste_centra = '501C')
 group by ide_poste, ide_cpt, ide_tiers
@@ -23,7 +23,7 @@ and flg_cptab = 'O'
 and ide_gest = '2025'
 --and spec3 is not null
 --and ide_jal <> 'JTRANSFERT'
-and dat_ecr between '01/01/2025' and '31/08/2025'
+and dat_ecr between '01/01/2025' and '30/09/2025'
 and cod_sens = 'C'
 --and ide_poste in (select ide_poste from piaf_adm.rm_poste where ide_poste_centra = '501C')
 group by ide_poste, ide_cpt, ide_tiers
@@ -92,7 +92,7 @@ select a_cible, a_emetteur, a_recepteur, a_compte, a_montant,
        left join rm_noeud on b_recepteur = ide_nd
 group by a_cible, a_emetteur, a_recepteur, a_compte, a_montant, 
       b_cible, b_emetteur, b_recepteur, libn, b_compte, b_montant
-having ((a_montant - b_montant) <> 0 or a_montant is null or b_montant is null)
+--having ((a_montant - b_montant) <> 0 or a_montant is null or b_montant is null)
 --having (a_montant - b_montant) = 0
 order by 4,2,3
 ;

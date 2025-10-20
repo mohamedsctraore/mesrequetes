@@ -18,7 +18,7 @@ select unique 'exec NIABA.Gener_cloture_journee_pc_bis ('''||ide_gest||''','''||
 from fc_calend_hist
 where ide_gest = '2025'
 and cod_ferm = 'O'
-and dat_jc <= '31/08/2025'
+and dat_jc <= '30/09/2025'
 --and (ide_poste not like '5%' and ide_poste not like '%C')
 and ide_poste not like '5%'
 --and to_char(dat_maj, 'dd/mm/yyyy') <> '16/09/2024'

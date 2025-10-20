@@ -26,7 +26,7 @@ create table centra_a_denouer as
 select ide_gest, ide_poste poste, b.libn libelle, ide_mess bordereau, a.libn observation--, a.cod_statut, periode 
 from centra_non_denoue a
 inner join rm_noeud b on a.ide_poste=b.ide_nd
-where periode between '01/01/2025' and '30/09/2025'
+where periode between '01/01/2025' and '31/10/2025'
 order by ide_poste, periode;
 
 -----  POINT NOMBRE DE BORDEREAU PAR POSTE ------
@@ -56,7 +56,7 @@ and a.ide_nd_emet=b.ide_nd_emet
 and a.ide_mess=b.ide_mess
 where a.ide_jal in ('JTRANSFERT')
 and a.libn like 'Transfert %'
-and a.ide_gest='2024'
+and a.ide_gest='2025'
 and a.cod_statut='AC'
 and b.flg_emis_recu='R'
 and b.cod_statut not in ('AN','TR')
@@ -68,7 +68,7 @@ create table transf_a_denouer as
 select ide_poste poste, b.libn libelle, ide_mess bordereau, a.libn observation
 from transfert_non_denoue a
 inner join rm_noeud b on a.ide_poste=b.ide_nd
-where periode between '01/01/2024' and '30/06/2024'
+where periode between '01/01/2025' and '30/09/2025'
 --and ide_poste in (select ide_poste from rm_poste where ide_typ_poste in ('ACCD','AACDC')) 
 order by ide_poste, periode;
 
